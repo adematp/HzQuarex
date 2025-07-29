@@ -2,39 +2,35 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HZQUAREX</title>
 </head>
-<body style="font-family: Arial; text-align: center; padding: 20px;">
+<body>
   <h1>HZQUAREX</h1>
   <p>Kart numaranızı girin, Maxipuan'ı öğrenin</p>
-
-  <input type="text" id="cardInput" placeholder="Kart numarası">
+  <input type="text" id="cardNumber" placeholder="Kart numarası">
   <button onclick="getPoints()">Maxipuan Sorgula</button>
-
-  <p id="result" style="margin-top: 20px; font-weight: bold;"></p>
+  <p id="result"></p>
 
   <script>
     function getPoints() {
-      const card = document.getElementById("cardInput").value;
-      if (!card) {
-        document.getElementById("result").innerText = "Lütfen kart numarası girin.";
-        return;
-      }
+      const card = document.getElementById('cardNumber').value;
+      const result = document.getElementById('result');
 
-      fetch("https://solwinsystemm.rf.gd/proxy.php", {
-        method: "POST",
+      result.textContent = "Sorgulanıyor...";
+
+      fetch('proxy.php', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: "card=" + encodeURIComponent(card)
+        body: 'card=' + encodeURIComponent(card)
       })
-      .then(res => res.text())
+      .then(response => response.text())
       .then(data => {
-        document.getElementById("result").innerText = data;
+        result.textContent = data;
       })
-      .catch(err => {
-        document.getElementById("result").innerText = "Bir hata oluştu: " + err;
+      .catch(error => {
+        result.textContent = "Bir hata oluştu: " + error;
       });
     }
   </script>
