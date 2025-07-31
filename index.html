@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>MAXIPUAN Kontrol</title>
-    <style>
-        body { font-family: Arial; background-color: #111; color: #eee; text-align: center; padding: 20px; }
-        textarea { width: 90%; height: 150px; margin-bottom: 10px; background: #222; color: #0f0; border: 1px solid #444; }
-        button { padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer; }
-        #sonuclar { margin-top: 20px; white-space: pre-wrap; text-align: left; }
-    </style>
+  <meta charset="UTF-8">
+  <title>MAXIPUAN Kontrol</title>
+  <style>
+    body { font-family: Arial; background-color: #111; color: #eee; text-align: center; padding: 20px; }
+    textarea { width: 90%; height: 150px; margin-bottom: 10px; background: #222; color: #0F0; border: 1px solid #444; }
+    button { padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer; }
+    #sonuclar { margin-top: 20px; white-space: pre-wrap; text-align: left; }
+  </style>
 </head>
 <body>
-    <h2>MAXIPUAN Sorgu Sistemi</h2>
-    <textarea id="cards" placeholder="xxxx|aa|yyyy|cvv şeklinde kartları giriniz..."></textarea><br>
-    <button onclick="kontrolEt()">Kontrol Et</button>
-    <div id="sonuclar"></div>
+  <h2>MAXIPUAN Sorgu Sistemi</h2>
+  <textarea id="cards" placeholder="xxxx|aa|yyyy|cvv şeklinde kartları giriniz..."></textarea><br>
+  <button onclick="kontrolEt()">Kontrol Et</button>
+  <div id="sonuclar"></div>
 
-    <script>
-        async function kontrolEt() {
-            const lines = document.getElementById('cards').value.trim().split('\n');
-            const resultsDiv = document.getElementById('sonuclar');
-            resultsDiv.innerHTML = "Sorgulanıyor...\n";
+<script>
+async function kontrolEt() {
+  const lines = document.getElementById('cards').value.trim().split('\n');
+  const resultsDiv = document.getElementById('sonuclar');
+  resultsDiv.innerText = "Sorgulanıyor...\n";
 
-            for (const line of lines) {
-                const response = await fetch('proxy.php?card=' + encodeURIComponent(line));
-                const result = await response.text();
-                resultsDiv.innerHTML += result + '\n';
-            }
-        }
-    </script>
+  for (const card of lines) {
+    const res = await fetch(`proxy.php?card=${encodeURIComponent(card)}`);
+    const text = await res.text();
+    resultsDiv.innerText += text + "\n";
+  }
+}
+</script>
 </body>
 </html>
