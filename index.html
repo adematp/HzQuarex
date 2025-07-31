@@ -1,33 +1,54 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>MAXIPUAN Kontrol</title>
-  <style>
-    body { font-family: Arial; background-color: #111; color: #eee; text-align: center; padding: 20px; }
-    textarea { width: 90%; height: 150px; margin-bottom: 10px; background: #222; color: #0F0; border: 1px solid #444; }
-    button { padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer; }
-    #sonuclar { margin-top: 20px; white-space: pre-wrap; text-align: left; }
-  </style>
+    <meta charset="UTF-8">
+    <title>MaxiPuan Kontrol</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #0f0;
+            font-family: monospace;
+            padding: 20px;
+        }
+        textarea, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+        }
+        #sonuclar {
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h2>MAXIPUAN Sorgu Sistemi</h2>
-  <textarea id="cards" placeholder="xxxx|aa|yyyy|cvv şeklinde kartları giriniz..."></textarea><br>
-  <button onclick="kontrolEt()">Kontrol Et</button>
-  <div id="sonuclar"></div>
+    <h2>💳 MaxiPuan Kart Kontrol - @HzQuarex</h2>
+    <textarea id="kartlar" rows="10" placeholder="4543592092725383|05|2027|000"></textarea>
+    <button onclick="kontrolEt()">Kontrol Et</button>
 
-<script>
-async function kontrolEt() {
-  const lines = document.getElementById('cards').value.trim().split('\n');
-  const resultsDiv = document.getElementById('sonuclar');
-  resultsDiv.innerText = "Sorgulanıyor...\n";
+    <div id="sonuclar"></div>
 
-  for (const card of lines) {
-    const res = await fetch(`proxy.php?card=${encodeURIComponent(card)}`);
-    const text = await res.text();
-    resultsDiv.innerText += text + "\n";
-  }
-}
-</script>
+    <script>
+        async function kontrolEt() {
+            const kartlar = document.getElementById("kartlar").value.trim().split("\n");
+            const sonuclar = document.getElementById("sonuclar");
+            sonuclar.innerHTML = "🔄 Kartlar kontrol ediliyor...\n";
+
+            for (const kart of kartlar) {
+                try {
+                    const res = await fetch(`/proxy.php?card=${encodeURIComponent(kart.trim())}`);
+                    const text = await res.text();
+                    sonuclar.innerHTML += text + "\n";
+                } catch (e) {
+                    sonuclar.innerHTML += `❌ HATA => ${kart}\n`;
+                }
+            }
+        }
+    </script>
 </body>
 </html>
